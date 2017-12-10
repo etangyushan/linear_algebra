@@ -72,7 +72,8 @@ class LinearRegressionTestCase(unittest.TestCase):
             b = np.random.randint(low=-10,high=10,size=(r,1))
             Amat = A.tolist()
             bmat = b.tolist()
-
+#             print "Amat:",Amat
+#             print "bmat:",bmat
             Ab = np.array(augmentMatrix(Amat,bmat))
             ab = np.hstack((A,b))
 
