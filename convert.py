@@ -1,10 +1,14 @@
+import os
 def convert_ipynb():
     #to html
     tohtml = "jupyter nbconvert --to html linear_regression_project.ipynb"
-    os.System(tohtml)
+    print tohtml
+    os.system(tohtml)
 
     #to python
     topython = "jupyter nbconvert --to python linear_regression_project.ipynb"
-    os.System(topython)
+    print topython
+    os.system(topython)
 
-convert_ipynb
+
+convert_ipynb()
