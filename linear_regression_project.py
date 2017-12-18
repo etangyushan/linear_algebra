@@ -120,14 +120,16 @@ get_ipython().magic(u'run -i -e test.py LinearRegressionTestCase.test_transpose'
 # TODO 计算矩阵乘法 AB，如果无法相乘则raise ValueError
 def matxMultiply(A, B):
     # return [[sum(a*b for a, b in zip(a,b)) for b in transpose(B)] for a in A]
+    if (len(A[0]) != len(B)):
+        raise ValueError
     try:
         res = [[0]*len(B[0]) for i in range(len(A))]
         for i in range(len(A)):
             for j in range(len(B[0])):
                 for k in xrange(len(A[0])):
                     res[i][j] += A[i][k]*B[k][j]
-    except Exception as e:
-        raise ValueError
+    except IndexError as e:
+        raise IndexError
 
     return res
 
@@ -422,17 +424,16 @@ def gj_Solve(A, b, decPts=4, epsilon = 1.0e-16):
     # print "Ab:",Ab
     #步骤3 逐列转换Ab为化简行阶梯形矩阵
     ##遍历列
-    max_row = 0
-    max_col = 0
-    max_num = 0
+
     for y in xrange(0, len(Ab[0])-1):
+        max_row = 0
+        max_num = 0
         # print "---------------y:",y
         ##遍历行,获取当前列绝对值最大的值
-        for x in range(len(Ab)):
+        for x in xrange(y, len(Ab)):
             if (max_num < abs(Ab[x][y])):
                 max_num = abs(Ab[x][y])
                 max_row = x
-                max_col = y
 
         if (max_num < epsilon):
             ##奇异矩阵
@@ -444,21 +445,20 @@ def gj_Solve(A, b, decPts=4, epsilon = 1.0e-16):
             # print "c_col:", c_col
             ##将绝对值最大值所在行交换到对角线元素所在行（行c）
             # print "swapRows Ab 1:", Ab
-            swapRows(Ab, max_row, max_col)
+            swapRows(Ab, max_row, y)
 
         # print "Ab-xy:", Ab[x][y]
         ##将列c的对角线元素缩放为1
         scaleRow(Ab, y, 1.0/Ab[y][y])
-        # print "scaleRow Ab:", Ab
-
+        # print "1111scaleRow Ab:", Ab
 
         for x in range(len(Ab)):
             ##多次使用第三个行变换，将列c的其他元素消为0
             if (x != y):
-                addScaledRow(Ab, y, x, -(1.0/Ab[x][y]))
+                # addScaledRow(Ab, y, x, -(1.0/Ab[x][y]))
+                addScaledRow(Ab, x, y, -Ab[x][y])
 
-
-   # print "scaleRow Ab:", Ab
+        # print "22222scaleRow Ab:",Ab
 
     ##整理格式
     matxRound (Ab, decPts)
@@ -558,7 +558,7 @@ plt.show()
 # MSE = \frac{1}{n}\sum_{i=1}^{n}{(y_i - mx_i - b)^2}
 # $$
 
-# In[31]:
+# In[27]:
 
 
 # TODO 实现以下函数并输出所选直线的MSE
@@ -690,7 +690,7 @@ print(calculateMSE(X,Y,m1,b1))
 # 
 # 在3.3 中，我们知道线性回归问题等价于求解 $X^TXh = X^TY$ (如果你选择不做3.3，就勇敢的相信吧，哈哈)
 
-# In[32]:
+# In[28]:
 
 
 # TODO 实现线性回归
@@ -722,7 +722,7 @@ print(m2,b2)
 # 你求得的回归结果是什么？
 # 请使用运行以下代码将它画出来。
 
-# In[33]:
+# In[29]:
 
 
 # 请不要修改下面的代码
@@ -740,7 +740,7 @@ plt.show()
 
 # 你求得的回归结果对当前数据集的MSE是多少？
 
-# In[34]:
+# In[30]:
 
 
 print(calculateMSE(X,Y,m2,b2))

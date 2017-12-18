@@ -22,31 +22,34 @@ def matxRound(M, decPts=4):
 # TODO 计算矩阵的转置
 def transpose(M):
     # return zip(*M)
-    try:
-        ret = [[0 for col in range(len(M))] for row in range(len(M[0]))]
-        for i in range(len(M)):
-            for j in range(len(M[i])):
-                ret[j][i] = M[i][j]
-        return ret
-    except Exception as e:
-        ret = []
-        ret.append(list(M))
-        return ret
+
+    # ret = [[0 for col in range(len(M))] for row in range(len(M[0]))]
+    # for i in range(len(M)):
+    #     for j in range(len(M[i])):
+    #         ret[j][i] = M[i][j]
+    # return ret
+    return [list(col) for col in zip(*M)]
 
 
 # TODO 计算矩阵乘法 AB，如果无法相乘则raise ValueError
 def matxMultiply(A, B):
     # return [[sum(a*b for a, b in zip(a,b)) for b in transpose(B)] for a in A]
+    if (len(A[0]) != len(B)):
+        raise ValueError
     try:
         res = [[0]*len(B[0]) for i in range(len(A))]
         for i in range(len(A)):
             for j in range(len(B[0])):
                 for k in xrange(len(A[0])):
                     res[i][j] += A[i][k]*B[k][j]
-    except Exception as e:
-        raise ValueError
+    except IndexError as e:
+        raise IndexError
 
     return res
+
+# A=[[1,2,3], [4,5,6],[7,8,9]]
+# B=[[1,2],[3,4],[5,6]]
+# matxMultiply(A, B)
 
 # TODO 构造增广矩阵，假设A，b行数相同
 from copy import deepcopy
@@ -140,17 +143,16 @@ def gj_Solve(A, b, decPts=4, epsilon = 1.0e-16):
     # print "Ab:",Ab
     #步骤3 逐列转换Ab为化简行阶梯形矩阵
     ##遍历列
-    max_row = 0
-    max_col = 0
-    max_num = 0
+
     for y in xrange(0, len(Ab[0])-1):
+        max_row = 0
+        max_num = 0
         # print "---------------y:",y
         ##遍历行,获取当前列绝对值最大的值
-        for x in range(len(Ab)):
+        for x in xrange(y, len(Ab)):
             if (max_num < abs(Ab[x][y])):
                 max_num = abs(Ab[x][y])
                 max_row = x
-                max_col = y
 
         if (max_num < epsilon):
             ##奇异矩阵
@@ -162,21 +164,20 @@ def gj_Solve(A, b, decPts=4, epsilon = 1.0e-16):
             # print "c_col:", c_col
             ##将绝对值最大值所在行交换到对角线元素所在行（行c）
             # print "swapRows Ab 1:", Ab
-            swapRows(Ab, max_row, max_col)
+            swapRows(Ab, max_row, y)
 
         # print "Ab-xy:", Ab[x][y]
         ##将列c的对角线元素缩放为1
         scaleRow(Ab, y, 1.0/Ab[y][y])
-        # print "scaleRow Ab:", Ab
-
+        # print "1111scaleRow Ab:", Ab
 
         for x in range(len(Ab)):
             ##多次使用第三个行变换，将列c的其他元素消为0
             if (x != y):
-                addScaledRow(Ab, y, x, -(1.0/Ab[x][y]))
+                # addScaledRow(Ab, y, x, -(1.0/Ab[x][y]))
+                addScaledRow(Ab, x, y, -Ab[x][y])
 
-
-   # print "scaleRow Ab:", Ab
+        # print "22222scaleRow Ab:",Ab
 
     ##整理格式
     matxRound (Ab, decPts)
@@ -186,10 +187,10 @@ def gj_Solve(A, b, decPts=4, epsilon = 1.0e-16):
         ret.append([Ab[i][(len(Ab[0])-1)]])
 
         # print "ret:",ret
-    # print "Ab:", Ab
+    print "Ab:", Ab
     # print "ret:", ret
     return ret
 
-A=[[1,2,1],[3,-1,-3],[2,3,1]]
-b=[[5],[-2],[1]]
+A=[[3,2,-1],[1,-2,-2],[11,2,1]]
+b=[[4],[1],[14]]
 print gj_Solve(A, b)
